@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { ProducersController } from './producers.controller';
-import { ProducersService } from './producers.service';
+import { ProducersService } from '../services/producers.service';
 import { UpdateProducerDto } from '../dto/update-producer.dto';
 import { CreateProducerDto } from '../dto/create-producer.dto';
 import { Producer } from '../entities/producer.entity';

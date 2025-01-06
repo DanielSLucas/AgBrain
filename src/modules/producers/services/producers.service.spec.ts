@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
 
 import { ProducersService } from '../services/producers.service';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/shared/prisma.service';
 import { Producer } from '../entities/producer.entity';
 
 describe('ProducersService', () => {
