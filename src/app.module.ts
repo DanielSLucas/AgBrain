@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 
-import { ProducersModule } from './modules/producers/producers.module';
-import { FarmsModule } from './modules/farms/farms.module';
-import { HarvestsModule } from './modules/harvests/harvests.module';
+import {
+  CropsModule,
+  FarmsModule,
+  HarvestsModule,
+  ProducersModule,
+} from './modules';
 
 @Module({
-  imports: [ProducersModule, FarmsModule, HarvestsModule],
+  imports: [ProducersModule, FarmsModule, HarvestsModule, CropsModule],
   controllers: [],
   providers: [],
 })
