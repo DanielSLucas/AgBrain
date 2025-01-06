@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  database:
+    container_name: postgres_smb
+    image: 'bitnami/postgresql:14'
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=app
+    volumes:
+      - $PWD/data/pg:/bitnami/postgresql    
