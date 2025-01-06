@@ -12,3 +12,50 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Producer {
+  id        String   @id @unique @default(uuid())
+  document  String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  farms Farm[]
+}
+
+model Farm {
+  id             String   @id @unique @default(uuid())
+  name           String
+  city           String
+  state          String
+  totalArea      Float
+  arableArea     Float
+  vegetationArea Float
+  producerId     String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+
+  producer Producer  @relation(fields: [producerId], references: [id])
+  harvests Harvest[]
+}
+
+model Harvest {
+  id        String   @id @unique @default(uuid())
+  year      Int
+  farmId    String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  farm  Farm   @relation(fields: [farmId], references: [id])
+  crops Crop[]
+}
+
+model Crop {
+  id        String   @id @unique @default(uuid())
+  name      String
+  harvestId String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  harvest Harvest @relation(fields: [harvestId], references: [id])
+}
