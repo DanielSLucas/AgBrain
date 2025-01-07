@@ -5,6 +5,7 @@ import { HarvestsService } from './harvests.service';
 import { PrismaService } from 'src/shared/prisma.service';
 import { Harvest } from '../entities/harvest.entity';
 import { CreateHarvestDto } from '../dto/create-harvest.dto';
+import { NotFound } from 'src/shared/errors/not-found';
 
 describe('HarvestsService', () => {
   let service: HarvestsService;
@@ -108,13 +109,12 @@ describe('HarvestsService', () => {
       });
     });
 
-    it('should return null if no harvest is found', async () => {
+    it('should throw NotFound error if no harvest is found', async () => {
       const id = 'non-existent-id';
 
       jest.spyOn(prisma.harvest, 'findUnique').mockResolvedValue(null);
 
-      const result = await service.findOne(id);
-      expect(result).toBeNull();
+      await expect(() => service.findOne(id)).rejects.toBeInstanceOf(NotFound);
       expect(prisma.harvest.findUnique).toHaveBeenCalledWith({
         where: { id },
       });
@@ -127,12 +127,15 @@ describe('HarvestsService', () => {
       const updateDto = { year: 2021 };
       const updatedHarvest = {
         id,
-        year: 2020,
+        year: 2021,
         farmId: 'farmId',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
+      jest
+        .spyOn(prisma.harvest, 'findUnique')
+        .mockResolvedValue({ ...updatedHarvest, year: 2020 });
       jest.spyOn(prisma.harvest, 'update').mockResolvedValue(updatedHarvest);
 
       const result = await service.update(id, updateDto);
@@ -142,16 +145,41 @@ describe('HarvestsService', () => {
         data: updateDto,
       });
     });
+
+    it('should throw NotFound error if no harvest is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.harvest, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.update(id, {})).rejects.toBeInstanceOf(
+        NotFound,
+      );
+      expect(prisma.harvest.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
   });
 
   describe('remove', () => {
     it('should delete a harvest by id', async () => {
       const id = '1';
 
+      jest.spyOn(prisma.harvest, 'findUnique').mockResolvedValue({} as Harvest);
       jest.spyOn(prisma.harvest, 'delete').mockResolvedValue(undefined);
 
       await service.remove(id);
       expect(prisma.harvest.delete).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
+
+    it('should throw NotFound error if no harvest is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.harvest, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.remove(id)).rejects.toBeInstanceOf(NotFound);
+      expect(prisma.harvest.findUnique).toHaveBeenCalledWith({
         where: { id },
       });
     });

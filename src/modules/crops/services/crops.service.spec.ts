@@ -5,6 +5,7 @@ import { CropsService } from './crops.service';
 import { PrismaService } from 'src/shared/prisma.service';
 import { Crop } from '../entities/crop.entity';
 import { CreateCropDto } from '../dto/create-crop.dto';
+import { NotFound } from 'src/shared/errors/not-found';
 
 describe('CropsService', () => {
   let service: CropsService;
@@ -106,13 +107,12 @@ describe('CropsService', () => {
       });
     });
 
-    it('should return null if no crop is found', async () => {
+    it('should throw NotFound error if no crop is found', async () => {
       const id = 'non-existent-id';
 
       jest.spyOn(prisma.crop, 'findUnique').mockResolvedValue(null);
 
-      const result = await service.findOne(id);
-      expect(result).toBeNull();
+      await expect(() => service.findOne(id)).rejects.toBeInstanceOf(NotFound);
       expect(prisma.crop.findUnique).toHaveBeenCalledWith({
         where: { id },
       });
@@ -125,12 +125,15 @@ describe('CropsService', () => {
       const updateDto = { name: 'soja' };
       const updatedCrop = {
         id,
-        name: 'milho',
+        name: 'soja',
         harvestId: 'harvestId',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
+      jest
+        .spyOn(prisma.crop, 'findUnique')
+        .mockResolvedValue({ ...updatedCrop, name: 'milho' });
       jest.spyOn(prisma.crop, 'update').mockResolvedValue(updatedCrop);
 
       const result = await service.update(id, updateDto);
@@ -140,16 +143,41 @@ describe('CropsService', () => {
         data: updateDto,
       });
     });
+
+    it('should throw NotFound error if no crop is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.crop, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.update(id, {})).rejects.toBeInstanceOf(
+        NotFound,
+      );
+      expect(prisma.crop.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
   });
 
   describe('remove', () => {
     it('should delete a crop by id', async () => {
       const id = '1';
 
+      jest.spyOn(prisma.crop, 'findUnique').mockResolvedValue({} as Crop);
       jest.spyOn(prisma.crop, 'delete').mockResolvedValue(undefined);
 
       await service.remove(id);
       expect(prisma.crop.delete).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
+
+    it('should throw NotFound error if no crop is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.crop, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.remove(id)).rejects.toBeInstanceOf(NotFound);
+      expect(prisma.crop.findUnique).toHaveBeenCalledWith({
         where: { id },
       });
     });

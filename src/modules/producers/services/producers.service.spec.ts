@@ -5,6 +5,7 @@ import { ProducersService } from '../services/producers.service';
 import { PrismaService } from 'src/shared/prisma.service';
 import { Producer } from '../entities/producer.entity';
 import { AlreadyExists } from 'src/shared/errors/already-exists';
+import { NotFound } from 'src/shared/errors/not-found';
 
 describe('ProducersService', () => {
   let service: ProducersService;
@@ -131,13 +132,12 @@ describe('ProducersService', () => {
       });
     });
 
-    it('should return null if no producer is found', async () => {
+    it('should throw NotFound error if no producer is found', async () => {
       const id = 'non-existent-id';
 
       jest.spyOn(prisma.producer, 'findUnique').mockResolvedValue(null);
 
-      const result = await service.findOne(id);
-      expect(result).toBeNull();
+      await expect(() => service.findOne(id)).rejects.toBeInstanceOf(NotFound);
       expect(prisma.producer.findUnique).toHaveBeenCalledWith({
         where: { id },
       });
@@ -156,6 +156,9 @@ describe('ProducersService', () => {
         updatedAt: new Date(),
       };
 
+      jest
+        .spyOn(prisma.producer, 'findUnique')
+        .mockResolvedValue({ ...updatedProducer, name: 'original-name' });
       jest.spyOn(prisma.producer, 'update').mockResolvedValue(updatedProducer);
 
       const result = await service.update(id, updateDto);
@@ -165,16 +168,43 @@ describe('ProducersService', () => {
         data: { name: updateDto.name },
       });
     });
+
+    it('should throw NotFound error if no producer is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.producer, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.update(id, {})).rejects.toBeInstanceOf(
+        NotFound,
+      );
+      expect(prisma.producer.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
   });
 
   describe('remove', () => {
     it('should delete a producer by id', async () => {
       const id = '1';
 
+      jest
+        .spyOn(prisma.producer, 'findUnique')
+        .mockResolvedValue({} as Producer);
       jest.spyOn(prisma.producer, 'delete').mockResolvedValue(undefined);
 
       await service.remove(id);
       expect(prisma.producer.delete).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
+
+    it('should throw NotFound error if no producer is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.producer, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.remove(id)).rejects.toBeInstanceOf(NotFound);
+      expect(prisma.producer.findUnique).toHaveBeenCalledWith({
         where: { id },
       });
     });

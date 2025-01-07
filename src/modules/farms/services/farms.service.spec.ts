@@ -5,6 +5,7 @@ import { CreateFarmDto } from '../dto/create-farm.dto';
 import { UpdateFarmDto } from '../dto/update-farm.dto';
 import { Farm } from '../entities/farm.entity';
 import { InvalidInput } from 'src/shared/errors/invalid-input';
+import { NotFound } from 'src/shared/errors/not-found';
 
 describe('FarmsService', () => {
   let service: FarmsService;
@@ -138,6 +139,17 @@ describe('FarmsService', () => {
       expect(result).toEqual(farm);
       expect(prisma.farm.findUnique).toHaveBeenCalledWith({ where: { id } });
     });
+
+    it('should throw NotFound error if no farm is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.farm, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.findOne(id)).rejects.toBeInstanceOf(NotFound);
+      expect(prisma.farm.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
   });
 
   describe('update', () => {
@@ -161,6 +173,11 @@ describe('FarmsService', () => {
         updatedAt: new Date(),
       };
 
+      jest.spyOn(prisma.farm, 'findUnique').mockResolvedValue({
+        ...updatedFarm,
+        name: 'Farm name',
+        totalArea: 100,
+      });
       jest.spyOn(prisma.farm, 'update').mockResolvedValue(updatedFarm);
 
       const result = await service.update(id, updateFarmDto);
@@ -170,16 +187,41 @@ describe('FarmsService', () => {
         data: updateFarmDto,
       });
     });
+
+    it('should throw NotFound error if no farm is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.farm, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.update(id, {})).rejects.toBeInstanceOf(
+        NotFound,
+      );
+      expect(prisma.farm.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
   });
 
   describe('remove', () => {
     it('should delete a farm by id', async () => {
       const id = '1';
 
+      jest.spyOn(prisma.farm, 'findUnique').mockResolvedValue({} as Farm);
       jest.spyOn(prisma.farm, 'delete').mockResolvedValue(undefined);
 
       await service.remove(id);
       expect(prisma.farm.delete).toHaveBeenCalledWith({ where: { id } });
+    });
+
+    it('should throw NotFound error if no farm is found', async () => {
+      const id = 'non-existent-id';
+
+      jest.spyOn(prisma.farm, 'findUnique').mockResolvedValue(null);
+
+      await expect(() => service.remove(id)).rejects.toBeInstanceOf(NotFound);
+      expect(prisma.farm.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
     });
   });
 });

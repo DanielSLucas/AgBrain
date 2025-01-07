@@ -7,6 +7,7 @@ import { CreateFarmDto } from '../dto/create-farm.dto';
 import { UpdateFarmDto } from '../dto/update-farm.dto';
 import { Farm } from '../entities/farm.entity';
 import { InvalidInput } from 'src/shared/errors/invalid-input';
+import { NotFound } from 'src/shared/errors/not-found';
 
 @Injectable()
 export class FarmsService {
@@ -37,19 +38,39 @@ export class FarmsService {
       where: { id },
     });
 
+    if (!farm) {
+      throw new NotFound('Farm not found');
+    }
+
     return plainToClass(Farm, farm);
   }
 
   async update(id: string, data: UpdateFarmDto) {
-    const farm = await this.prisma.farm.update({
+    const farm = await this.prisma.farm.findUnique({
+      where: { id },
+    });
+
+    if (!farm) {
+      throw new NotFound('Farm not found');
+    }
+
+    const updatedFarm = await this.prisma.farm.update({
       where: { id },
       data,
     });
 
-    return plainToClass(Farm, farm);
+    return plainToClass(Farm, updatedFarm);
   }
 
   async remove(id: string) {
+    const farm = await this.prisma.farm.findUnique({
+      where: { id },
+    });
+
+    if (!farm) {
+      throw new NotFound('Farm not found');
+    }
+
     await this.prisma.farm.delete({
       where: { id },
     });

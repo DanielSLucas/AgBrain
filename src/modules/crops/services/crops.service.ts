@@ -6,6 +6,7 @@ import { PrismaService } from 'src/shared/prisma.service';
 import { CreateCropDto } from '../dto/create-crop.dto';
 import { UpdateCropDto } from '../dto/update-crop.dto';
 import { Crop } from '../entities/crop.entity';
+import { NotFound } from 'src/shared/errors/not-found';
 
 @Injectable()
 export class CropsService {
@@ -30,19 +31,39 @@ export class CropsService {
       where: { id },
     });
 
+    if (!crop) {
+      throw new NotFound('Crop not found');
+    }
+
     return plainToClass(Crop, crop);
   }
 
   async update(id: string, data: UpdateCropDto) {
-    const crop = await this.prisma.crop.update({
+    const crop = await this.prisma.crop.findUnique({
+      where: { id },
+    });
+
+    if (!crop) {
+      throw new NotFound('Crop not found');
+    }
+
+    const updatedCrop = await this.prisma.crop.update({
       where: { id },
       data,
     });
 
-    return plainToClass(Crop, crop);
+    return plainToClass(Crop, updatedCrop);
   }
 
   async remove(id: string) {
+    const crop = await this.prisma.crop.findUnique({
+      where: { id },
+    });
+
+    if (!crop) {
+      throw new NotFound('Crop not found');
+    }
+
     await this.prisma.crop.delete({
       where: { id },
     });

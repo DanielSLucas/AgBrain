@@ -6,6 +6,7 @@ import { PrismaService } from 'src/shared/prisma.service';
 import { CreateHarvestDto } from '../dto/create-harvest.dto';
 import { UpdateHarvestDto } from '../dto/update-harvest.dto';
 import { Harvest } from '../entities/harvest.entity';
+import { NotFound } from 'src/shared/errors/not-found';
 
 @Injectable()
 export class HarvestsService {
@@ -30,19 +31,39 @@ export class HarvestsService {
       where: { id },
     });
 
+    if (!harvest) {
+      throw new NotFound('Harvest not found');
+    }
+
     return plainToClass(Harvest, harvest);
   }
 
   async update(id: string, data: UpdateHarvestDto) {
-    const harvest = await this.prisma.harvest.update({
+    const harvest = await this.prisma.harvest.findUnique({
+      where: { id },
+    });
+
+    if (!harvest) {
+      throw new NotFound('Harvest not found');
+    }
+
+    const updatedHarvest = await this.prisma.harvest.update({
       where: { id },
       data,
     });
 
-    return plainToClass(Harvest, harvest);
+    return plainToClass(Harvest, updatedHarvest);
   }
 
   async remove(id: string) {
+    const harvest = await this.prisma.harvest.findUnique({
+      where: { id },
+    });
+
+    if (!harvest) {
+      throw new NotFound('Harvest not found');
+    }
+
     await this.prisma.harvest.delete({
       where: { id },
     });
