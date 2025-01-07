@@ -6,12 +6,23 @@ import { PrismaService } from 'src/shared/prisma.service';
 import { CreateProducerDto } from '../dto/create-producer.dto';
 import { UpdateProducerDto } from '../dto/update-producer.dto';
 import { Producer } from '../entities/producer.entity';
+import { AlreadyExists } from 'src/shared/errors/already-exists';
 
 @Injectable()
 export class ProducersService {
   constructor(private prisma: PrismaService) {}
 
   async create({ name, document }: CreateProducerDto) {
+    console.log({ document });
+
+    const producerWithSameDocument = await this.prisma.producer.findFirst({
+      where: { document },
+    });
+
+    if (producerWithSameDocument) {
+      throw new AlreadyExists(`Producer already exists`);
+    }
+
     const producer = await this.prisma.producer.create({
       data: { name, document },
     });

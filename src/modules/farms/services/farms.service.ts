@@ -54,4 +54,21 @@ export class FarmsService {
       where: { id },
     });
   }
+
+  async totalFarmsCount() {
+    return this.prisma.farm.count();
+  }
+
+  async totalFarmsArea() {
+    return this.prisma.farm.aggregate({ _sum: { totalArea: true } });
+  }
+
+  async totalByState() {
+    return this.prisma.farm.groupBy({
+      by: ['state'],
+      _count: {
+        id: true,
+      },
+    });
+  }
 }
