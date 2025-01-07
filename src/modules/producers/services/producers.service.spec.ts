@@ -4,6 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { ProducersService } from '../services/producers.service';
 import { PrismaService } from 'src/shared/prisma.service';
 import { Producer } from '../entities/producer.entity';
+import { AlreadyExists } from 'src/shared/errors/already-exists';
 
 describe('ProducersService', () => {
   let service: ProducersService;
@@ -14,6 +15,7 @@ describe('ProducersService', () => {
       create: jest.fn(),
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
     },
@@ -48,6 +50,7 @@ describe('ProducersService', () => {
         updatedAt: new Date(),
       };
 
+      jest.spyOn(prisma.producer, 'findFirst').mockResolvedValue(null);
       jest.spyOn(prisma.producer, 'create').mockResolvedValue(createdProducer);
 
       const result = await service.create(dto);
@@ -55,6 +58,27 @@ describe('ProducersService', () => {
       expect(prisma.producer.create).toHaveBeenCalledWith({
         data: dto,
       });
+    });
+
+    it('should not create a new producer with same document of a previous one', async () => {
+      const dto = {
+        name: 'John Doe',
+        document: '12345678910',
+      };
+      const existentProducer = {
+        id: '1',
+        ...dto,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      jest
+        .spyOn(prisma.producer, 'findFirst')
+        .mockResolvedValue(existentProducer);
+
+      await expect(() => service.create(dto)).rejects.toBeInstanceOf(
+        AlreadyExists,
+      );
     });
   });
 

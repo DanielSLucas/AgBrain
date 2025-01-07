@@ -13,8 +13,6 @@ export class ProducersService {
   constructor(private prisma: PrismaService) {}
 
   async create({ name, document }: CreateProducerDto) {
-    console.log({ document });
-
     const producerWithSameDocument = await this.prisma.producer.findFirst({
       where: { document },
     });
