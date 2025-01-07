@@ -55,6 +55,7 @@ export class FarmsController {
   }
 
   @Get('/areas')
+  @ApiTags('Dashboard')
   @ApiOperation({ summary: 'Retrieve farms total area' })
   @ApiResponse({
     status: 200,
@@ -66,6 +67,7 @@ export class FarmsController {
   }
 
   @Get('/areas/by-type')
+  @ApiTags('Dashboard')
   @ApiOperation({ summary: 'Retrieve farms total area by type' })
   @ApiResponse({
     status: 200,
@@ -77,6 +79,7 @@ export class FarmsController {
   }
 
   @Get('/count')
+  @ApiTags('Dashboard')
   @ApiOperation({ summary: 'Retrieve total number of farms' })
   @ApiResponse({
     status: 200,
@@ -88,6 +91,7 @@ export class FarmsController {
   }
 
   @Get('/count/by-state')
+  @ApiTags('Dashboard')
   @ApiOperation({ summary: 'Retrieve total number of farms by state' })
   @ApiResponse({
     status: 200,

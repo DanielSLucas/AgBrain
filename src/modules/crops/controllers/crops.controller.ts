@@ -48,6 +48,7 @@ export class CropsController {
   }
 
   @Get('/count/by-name')
+  @ApiTags('Dashboard')
   @ApiOperation({ summary: 'Retrieve total number of crops by name' })
   @ApiResponse({
     status: 200,
