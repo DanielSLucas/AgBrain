@@ -68,4 +68,13 @@ export class CropsService {
       where: { id },
     });
   }
+
+  async totalByCrop() {
+    return this.prisma.crop.groupBy({
+      by: ['name'],
+      _count: {
+        id: true,
+      },
+    });
+  }
 }

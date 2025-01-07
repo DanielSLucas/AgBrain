@@ -92,4 +92,10 @@ export class FarmsService {
       },
     });
   }
+
+  async totalFarmsAreasByType() {
+    return this.prisma.farm.aggregate({
+      _sum: { arableArea: true, vegetationArea: true },
+    });
+  }
 }
