@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/shared/prisma.service';
 import { FarmsService } from './farms.service';
-import { CreateFarmDto } from '../dto/create-farm.dto';
-import { UpdateFarmDto } from '../dto/update-farm.dto';
+import { CreateFarmDto, UpdateFarmDto } from '../dto';
 import { Farm } from '../entities/farm.entity';
 import { InvalidInput } from 'src/shared/errors/invalid-input';
 import { NotFound } from 'src/shared/errors/not-found';
@@ -18,6 +17,9 @@ describe('FarmsService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
+      aggregate: jest.fn(),
+      groupBy: jest.fn(),
     },
   };
 
@@ -221,6 +223,81 @@ describe('FarmsService', () => {
       await expect(() => service.remove(id)).rejects.toBeInstanceOf(NotFound);
       expect(prisma.farm.findUnique).toHaveBeenCalledWith({
         where: { id },
+      });
+    });
+  });
+
+  describe('totalFarmsCount', () => {
+    it('should return the total count of farms', async () => {
+      const mockCount = 5;
+
+      jest.spyOn(prisma.farm, 'count').mockResolvedValue(mockCount);
+
+      const result = await service.totalFarmsCount();
+      expect(result).toEqual({ count: mockCount });
+      expect(prisma.farm.count).toHaveBeenCalled();
+    });
+  });
+
+  describe('totalFarmsArea', () => {
+    it('should return the total area of all farms', async () => {
+      const mockTotalArea = 500;
+
+      jest.spyOn(prisma.farm, 'aggregate').mockResolvedValue({
+        _sum: { totalArea: mockTotalArea },
+      } as any);
+
+      const result = await service.totalFarmsArea();
+      expect(result).toEqual({ totalArea: mockTotalArea });
+      expect(prisma.farm.aggregate).toHaveBeenCalledWith({
+        _sum: { totalArea: true },
+      });
+    });
+  });
+
+  describe('totalByState', () => {
+    it('should return the count of farms grouped by state', async () => {
+      const mockGroupByState = [
+        { state: 'State A', _count: { id: 3 } },
+        { state: 'State B', _count: { id: 2 } },
+      ];
+
+      jest
+        .spyOn(prisma.farm as any, 'groupBy')
+        .mockResolvedValue(mockGroupByState);
+
+      const result = await service.totalByState();
+      expect(result).toEqual([
+        { state: 'State A', count: 3 },
+        { state: 'State B', count: 2 },
+      ]);
+      expect(prisma.farm.groupBy).toHaveBeenCalledWith({
+        by: ['state'],
+        _count: { id: true },
+      });
+    });
+  });
+
+  describe('totalFarmsAreasByType', () => {
+    it('should return the total arable and vegetation areas', async () => {
+      const mockAggregateResult = {
+        _sum: {
+          arableArea: 300,
+          vegetationArea: 200,
+        },
+      };
+
+      jest
+        .spyOn(prisma.farm, 'aggregate')
+        .mockResolvedValue(mockAggregateResult as any);
+
+      const result = await service.totalFarmsAreasByType();
+      expect(result).toEqual({
+        arableArea: 300,
+        vegetationArea: 200,
+      });
+      expect(prisma.farm.aggregate).toHaveBeenCalledWith({
+        _sum: { arableArea: true, vegetationArea: true },
       });
     });
   });

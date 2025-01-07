@@ -77,25 +77,42 @@ export class FarmsService {
   }
 
   async totalFarmsCount() {
-    return this.prisma.farm.count();
+    const count = await this.prisma.farm.count();
+
+    return { count };
   }
 
   async totalFarmsArea() {
-    return this.prisma.farm.aggregate({ _sum: { totalArea: true } });
+    const {
+      _sum: { totalArea },
+    } = await this.prisma.farm.aggregate({
+      _sum: { totalArea: true },
+    });
+
+    return { totalArea };
   }
 
   async totalByState() {
-    return this.prisma.farm.groupBy({
+    const countByState = await this.prisma.farm.groupBy({
       by: ['state'],
       _count: {
         id: true,
       },
     });
+
+    return countByState.map((item) => ({
+      state: item.state,
+      count: item._count.id,
+    }));
   }
 
   async totalFarmsAreasByType() {
-    return this.prisma.farm.aggregate({
+    const {
+      _sum: { arableArea, vegetationArea },
+    } = await this.prisma.farm.aggregate({
       _sum: { arableArea: true, vegetationArea: true },
     });
+
+    return { arableArea, vegetationArea };
   }
 }

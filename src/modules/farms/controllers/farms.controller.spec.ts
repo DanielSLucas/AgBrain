@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FarmsController } from './farms.controller';
 import { FarmsService } from '../services/farms.service';
-import { CreateFarmDto } from '../dto/create-farm.dto';
-import { UpdateFarmDto } from '../dto/update-farm.dto';
+import { CreateFarmDto, UpdateFarmDto } from '../dto';
 import { Farm } from '../entities/farm.entity';
 
 describe('FarmsController', () => {
@@ -15,6 +14,10 @@ describe('FarmsController', () => {
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    totalFarmsCount: jest.fn(),
+    totalFarmsArea: jest.fn(),
+    totalByState: jest.fn(),
+    totalFarmsAreasByType: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -164,7 +167,59 @@ describe('FarmsController', () => {
       jest.spyOn(service, 'remove').mockResolvedValue(undefined);
 
       const result = await controller.remove(id);
-      expect(result).toBeUndefined(); // The method returns void
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('totalFarmsArea', () => {
+    it('should return the total farms area', async () => {
+      const totalArea = { totalArea: 1000 };
+      jest.spyOn(service, 'totalFarmsArea').mockResolvedValue(totalArea);
+
+      const result = await controller.totalFarmsArea();
+      expect(result).toEqual(totalArea);
+      expect(service.totalFarmsArea).toHaveBeenCalled();
+    });
+  });
+
+  describe('totalFarmsAreasByType', () => {
+    it('should return the total farms area by type', async () => {
+      const areasByType = {
+        arableArea: 700,
+        vegetationArea: 300,
+      };
+      jest
+        .spyOn(service, 'totalFarmsAreasByType')
+        .mockResolvedValue(areasByType);
+
+      const result = await controller.totalFarmsAreasByType();
+      expect(result).toEqual(areasByType);
+      expect(service.totalFarmsAreasByType).toHaveBeenCalled();
+    });
+  });
+
+  describe('totalFarmsCount', () => {
+    it('should return the total number of farms', async () => {
+      const farmCount = { count: 15 };
+      jest.spyOn(service, 'totalFarmsCount').mockResolvedValue(farmCount);
+
+      const result = await controller.totalFarmsCount();
+      expect(result).toEqual(farmCount);
+      expect(service.totalFarmsCount).toHaveBeenCalled();
+    });
+  });
+
+  describe('totalByState', () => {
+    it('should return the total number of farms by state', async () => {
+      const farmsByState = [
+        { state: 'State A', count: 10 },
+        { state: 'State B', count: 5 },
+      ];
+      jest.spyOn(service, 'totalByState').mockResolvedValue(farmsByState);
+
+      const result = await controller.totalByState();
+      expect(result).toEqual(farmsByState);
+      expect(service.totalByState).toHaveBeenCalled();
     });
   });
 });

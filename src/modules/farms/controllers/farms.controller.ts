@@ -18,9 +18,15 @@ import {
 } from '@nestjs/swagger';
 
 import { FarmsService } from '../services/farms.service';
-import { CreateFarmDto } from '../dto/create-farm.dto';
-import { UpdateFarmDto } from '../dto/update-farm.dto';
 import { Farm } from '../entities/farm.entity';
+import {
+  CreateFarmDto,
+  UpdateFarmDto,
+  TotalFarmsAreaDto,
+  TotalFarmsAreaByTypeDto,
+  FarmsCountDto,
+  FarmsCountByStateDto,
+} from '../dto';
 
 @ApiTags('Farms')
 @Controller('farms')
@@ -46,6 +52,50 @@ export class FarmsController {
   @ApiResponse({ status: 200, description: 'List of farms', type: [Farm] })
   async findAll(): Promise<Farm[]> {
     return this.farmsService.findAll();
+  }
+
+  @Get('/areas')
+  @ApiOperation({ summary: 'Retrieve farms total area' })
+  @ApiResponse({
+    status: 200,
+    description: 'Farms total area',
+    type: TotalFarmsAreaDto,
+  })
+  async totalFarmsArea() {
+    return this.farmsService.totalFarmsArea();
+  }
+
+  @Get('/areas/by-type')
+  @ApiOperation({ summary: 'Retrieve farms total area by type' })
+  @ApiResponse({
+    status: 200,
+    description: 'Farms total area by type',
+    type: TotalFarmsAreaByTypeDto,
+  })
+  async totalFarmsAreasByType() {
+    return this.farmsService.totalFarmsAreasByType();
+  }
+
+  @Get('/count')
+  @ApiOperation({ summary: 'Retrieve total number of farms' })
+  @ApiResponse({
+    status: 200,
+    description: 'Farms count',
+    type: FarmsCountDto,
+  })
+  async totalFarmsCount() {
+    return this.farmsService.totalFarmsCount();
+  }
+
+  @Get('/count/by-state')
+  @ApiOperation({ summary: 'Retrieve total number of farms by state' })
+  @ApiResponse({
+    status: 200,
+    description: 'Farms count by state',
+    type: [FarmsCountByStateDto],
+  })
+  async totalByState() {
+    return this.farmsService.totalByState();
   }
 
   @Get(':id')
