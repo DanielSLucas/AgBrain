@@ -18,6 +18,7 @@ describe('CropsService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      groupBy: jest.fn(),
     },
   };
 
@@ -179,6 +180,29 @@ describe('CropsService', () => {
       await expect(() => service.remove(id)).rejects.toBeInstanceOf(NotFound);
       expect(prisma.crop.findUnique).toHaveBeenCalledWith({
         where: { id },
+      });
+    });
+  });
+
+  describe('totalByCropName', () => {
+    it('should return the count of crops grouped by name', async () => {
+      const mockGroupByCrop = [
+        { name: 'Crop A', _count: { id: 3 } },
+        { name: 'Crop B', _count: { id: 2 } },
+      ];
+
+      jest
+        .spyOn(prisma.crop as any, 'groupBy')
+        .mockResolvedValue(mockGroupByCrop);
+
+      const result = await service.totalByCropName();
+      expect(result).toEqual([
+        { crop: 'Crop A', count: 3 },
+        { crop: 'Crop B', count: 2 },
+      ]);
+      expect(prisma.crop.groupBy).toHaveBeenCalledWith({
+        by: ['name'],
+        _count: { id: true },
       });
     });
   });

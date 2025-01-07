@@ -9,11 +9,6 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-
-import { CropsService } from '../services/crops.service';
-import { CreateCropDto } from '../dto/create-crop.dto';
-import { UpdateCropDto } from '../dto/update-crop.dto';
-import { Crop } from '../entities/crop.entity';
 import {
   ApiBody,
   ApiOperation,
@@ -21,6 +16,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { CropsService } from '../services/crops.service';
+import { CreateCropDto, UpdateCropDto, CropsCountByNameDto } from '../dto';
+import { Crop } from '../entities/crop.entity';
 
 @ApiTags('Crops')
 @Controller('crops')
@@ -46,6 +45,17 @@ export class CropsController {
   @ApiResponse({ status: 200, description: 'List of crops', type: [Crop] })
   async findAll(): Promise<Crop[]> {
     return this.cropsService.findAll();
+  }
+
+  @Get('/count/by-name')
+  @ApiOperation({ summary: 'Retrieve total number of crops by name' })
+  @ApiResponse({
+    status: 200,
+    description: 'Crops count by name',
+    type: [CropsCountByNameDto],
+  })
+  async totalByCropName() {
+    return this.cropsService.totalByCropName();
   }
 
   @Get(':id')

@@ -69,12 +69,17 @@ export class CropsService {
     });
   }
 
-  async totalByCrop() {
-    return this.prisma.crop.groupBy({
+  async totalByCropName() {
+    const countByCropName = await this.prisma.crop.groupBy({
       by: ['name'],
       _count: {
         id: true,
       },
     });
+
+    return countByCropName.map((item) => ({
+      crop: item.name,
+      count: item._count.id,
+    }));
   }
 }

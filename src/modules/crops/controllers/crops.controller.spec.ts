@@ -16,6 +16,7 @@ describe('CropsController', () => {
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    totalByCropName: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -137,6 +138,20 @@ describe('CropsController', () => {
       const result = await controller.remove(id);
       expect(result).toBeUndefined();
       expect(service.remove).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('totalByCropName', () => {
+    it('should return the total number of crops by name', async () => {
+      const cropsByName = [
+        { crop: 'Crop A', count: 10 },
+        { crop: 'Crop B', count: 5 },
+      ];
+      jest.spyOn(service, 'totalByCropName').mockResolvedValue(cropsByName);
+
+      const result = await controller.totalByCropName();
+      expect(result).toEqual(cropsByName);
+      expect(service.totalByCropName).toHaveBeenCalled();
     });
   });
 });
