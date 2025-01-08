@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { HttpInterceptor } from './shared/interceptors/http-interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,7 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, documentFactory);
   }
 
+  app.useGlobalInterceptors(new HttpInterceptor());
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   await app.listen(process.env.PORT ?? 3000);
