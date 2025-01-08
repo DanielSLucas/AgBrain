@@ -4,7 +4,7 @@ import { HarvestsController } from './harvests.controller';
 import { HarvestsService } from '../services/harvests.service';
 import { UpdateHarvestDto } from '../dto/update-harvest.dto';
 import { CreateHarvestDto } from '../dto/create-harvest.dto';
-import { Harvest } from '../entities/harvest.entity';
+import { makeHarvest } from 'src/shared/utils/factories';
 
 describe('HarvestsController', () => {
   let controller: HarvestsController;
@@ -38,12 +38,7 @@ describe('HarvestsController', () => {
         year: 2020,
         farmId: 'farmId',
       };
-      const createdHarvest: Harvest = {
-        id: '1',
-        ...dto,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const createdHarvest = makeHarvest(dto);
 
       jest.spyOn(service, 'create').mockResolvedValue(createdHarvest);
 
@@ -55,21 +50,9 @@ describe('HarvestsController', () => {
 
   describe('findAll', () => {
     it('should return an array of harvests', async () => {
-      const harvests: Harvest[] = [
-        {
-          id: '1',
-          year: 2020,
-          farmId: 'farmId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          year: 2020,
-          farmId: 'farmId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+      const harvests = [
+        makeHarvest({ id: '1', year: 2020, farmId: 'farmId' }),
+        makeHarvest({ id: '2', year: 2020, farmId: 'farmId' }),
       ];
 
       jest.spyOn(service, 'findAll').mockResolvedValue(harvests);
@@ -83,13 +66,7 @@ describe('HarvestsController', () => {
   describe('findOne', () => {
     it('should return a harvest by id', async () => {
       const id = '1';
-      const harvest: Harvest = {
-        id,
-        year: 2020,
-        farmId: 'farmId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const harvest = makeHarvest({ id: '1', year: 2020, farmId: 'farmId' });
 
       jest.spyOn(service, 'findOne').mockResolvedValue(harvest);
 
@@ -103,13 +80,11 @@ describe('HarvestsController', () => {
     it('should update a harvest', async () => {
       const id = '1';
       const dto: UpdateHarvestDto = { year: 2021 };
-      const updatedHarvest: Harvest = {
+      const updatedHarvest = makeHarvest({
         id,
-        year: 2020,
+        year: dto.year,
         farmId: 'farmId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
       jest.spyOn(service, 'update').mockResolvedValue(updatedHarvest);
 

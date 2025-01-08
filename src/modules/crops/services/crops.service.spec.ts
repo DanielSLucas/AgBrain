@@ -6,6 +6,7 @@ import { PrismaService } from 'src/shared/database/prisma.service';
 import { Crop } from '../entities/crop.entity';
 import { CreateCropDto } from '../dto/create-crop.dto';
 import { NotFound } from 'src/shared/errors/not-found';
+import { makeCrop } from 'src/shared/utils/factories';
 
 describe('CropsService', () => {
   let service: CropsService;
@@ -44,12 +45,7 @@ describe('CropsService', () => {
         name: 'milho',
         harvestId: 'harvestId',
       };
-      const createdCrop = {
-        id: '1',
-        ...dto,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const createdCrop = makeCrop(dto);
 
       jest.spyOn(prisma.crop, 'create').mockResolvedValue(createdCrop);
 
@@ -63,22 +59,7 @@ describe('CropsService', () => {
 
   describe('findAll', () => {
     it('should return all crops', async () => {
-      const crops = [
-        {
-          id: '1',
-          name: 'milho',
-          harvestId: 'harvestId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          name: 'milho',
-          harvestId: 'harvestId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+      const crops = [makeCrop(), makeCrop()];
 
       jest.spyOn(prisma.crop, 'findMany').mockResolvedValue(crops);
 
@@ -91,13 +72,7 @@ describe('CropsService', () => {
   describe('findOne', () => {
     it('should return a crop by id', async () => {
       const id = '1';
-      const crop = {
-        id,
-        name: 'milho',
-        harvestId: 'harvestId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const crop = makeCrop({ id });
 
       jest.spyOn(prisma.crop, 'findUnique').mockResolvedValue(crop);
 
@@ -124,13 +99,7 @@ describe('CropsService', () => {
     it('should update a crop', async () => {
       const id = '1';
       const updateDto = { name: 'soja' };
-      const updatedCrop = {
-        id,
-        name: 'soja',
-        harvestId: 'harvestId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const updatedCrop = makeCrop({ id, ...updateDto });
 
       jest
         .spyOn(prisma.crop, 'findUnique')

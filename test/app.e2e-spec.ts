@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { MockPrismaService } from 'src/shared/utils/mock-prisma.service';
 import { PrismaService } from 'src/shared/database/prisma.service';
-import { makeCrop, makeFarm } from './factories';
+import { makeCrop, makeFarm } from 'src/shared/utils/factories';
 
 describe('End to end testing', () => {
   let app: INestApplication;

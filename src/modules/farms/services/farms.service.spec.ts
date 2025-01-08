@@ -5,6 +5,7 @@ import { CreateFarmDto, UpdateFarmDto } from '../dto';
 import { Farm } from '../entities/farm.entity';
 import { InvalidInput } from 'src/shared/errors/invalid-input';
 import { NotFound } from 'src/shared/errors/not-found';
+import { makeFarm } from 'src/shared/utils/factories';
 
 describe('FarmsService', () => {
   let service: FarmsService;
@@ -51,12 +52,7 @@ describe('FarmsService', () => {
         producerId: 'producerId',
       };
 
-      const createdFarm: Farm = {
-        id: '1',
-        ...createFarmDto,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const createdFarm = makeFarm(createFarmDto);
 
       jest.spyOn(prisma.farm, 'create').mockResolvedValue(createdFarm);
 
@@ -84,32 +80,7 @@ describe('FarmsService', () => {
 
   describe('findAll', () => {
     it('should return an array of farms', async () => {
-      const farms: Farm[] = [
-        {
-          id: '1',
-          name: 'Farm 1',
-          city: 'City A',
-          state: 'State A',
-          totalArea: 100,
-          arableArea: 70,
-          vegetationArea: 30,
-          producerId: 'producerId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          name: 'Farm 2',
-          city: 'City B',
-          state: 'State B',
-          totalArea: 200,
-          arableArea: 150,
-          vegetationArea: 50,
-          producerId: 'producerId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+      const farms: Farm[] = [makeFarm(), makeFarm()];
 
       jest.spyOn(prisma.farm, 'findMany').mockResolvedValue(farms);
 
@@ -122,18 +93,7 @@ describe('FarmsService', () => {
   describe('findOne', () => {
     it('should return a farm by id', async () => {
       const id = '1';
-      const farm: Farm = {
-        id,
-        name: 'Farm 1',
-        city: 'City A',
-        state: 'State A',
-        totalArea: 100,
-        arableArea: 70,
-        vegetationArea: 30,
-        producerId: 'producerId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const farm = makeFarm({ id });
 
       jest.spyOn(prisma.farm, 'findUnique').mockResolvedValue(farm);
 
@@ -162,18 +122,11 @@ describe('FarmsService', () => {
         totalArea: 120,
       };
 
-      const updatedFarm: Farm = {
+      const updatedFarm = makeFarm({
         id,
         name: updateFarmDto.name,
-        city: 'City A',
-        state: 'State A',
         totalArea: updateFarmDto.totalArea,
-        arableArea: 70,
-        vegetationArea: 30,
-        producerId: 'producerId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
       jest.spyOn(prisma.farm, 'findUnique').mockResolvedValue({
         ...updatedFarm,

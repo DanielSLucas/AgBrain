@@ -5,6 +5,7 @@ import { ProducersService } from '../services/producers.service';
 import { UpdateProducerDto } from '../dto/update-producer.dto';
 import { CreateProducerDto } from '../dto/create-producer.dto';
 import { Producer } from '../entities/producer.entity';
+import { makeProducer } from 'src/shared/utils/factories';
 
 describe('ProducersController', () => {
   let controller: ProducersController;
@@ -40,12 +41,7 @@ describe('ProducersController', () => {
         name: 'John Doe',
         document: '123456789',
       };
-      const createdProducer: Producer = {
-        id: '1',
-        ...dto,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const createdProducer = makeProducer(dto);
 
       jest.spyOn(service, 'create').mockResolvedValue(createdProducer);
 
@@ -58,20 +54,8 @@ describe('ProducersController', () => {
   describe('findAll', () => {
     it('should return an array of producers', async () => {
       const producers: Producer[] = [
-        {
-          id: '1',
-          name: 'John Doe',
-          document: '123456789',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          name: 'Jane Doe',
-          document: '987654321',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+        makeProducer({ name: 'John Doe', document: '123456789' }),
+        makeProducer({ name: 'Jane Doe', document: '987654321' }),
       ];
 
       jest.spyOn(service, 'findAll').mockResolvedValue(producers);
@@ -85,13 +69,11 @@ describe('ProducersController', () => {
   describe('findOne', () => {
     it('should return a producer by id', async () => {
       const id = '1';
-      const producer: Producer = {
+      const producer: Producer = makeProducer({
         id,
         name: 'John Doe',
         document: '123456789',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
       jest.spyOn(service, 'findOne').mockResolvedValue(producer);
 
@@ -105,13 +87,11 @@ describe('ProducersController', () => {
     it('should update a producer', async () => {
       const id = '1';
       const dto: UpdateProducerDto = { name: 'Updated Name' };
-      const updatedProducer: Producer = {
+      const updatedProducer: Producer = makeProducer({
         id,
         name: dto.name,
         document: '123456789',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
       jest.spyOn(service, 'update').mockResolvedValue(updatedProducer);
 

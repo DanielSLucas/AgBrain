@@ -6,6 +6,7 @@ import { PrismaService } from 'src/shared/database/prisma.service';
 import { Producer } from '../entities/producer.entity';
 import { AlreadyExists } from 'src/shared/errors/already-exists';
 import { NotFound } from 'src/shared/errors/not-found';
+import { makeProducer } from 'src/shared/utils/factories';
 
 describe('ProducersService', () => {
   let service: ProducersService;
@@ -44,12 +45,7 @@ describe('ProducersService', () => {
         name: 'John Doe',
         document: '12345678910',
       };
-      const createdProducer = {
-        id: '1',
-        ...dto,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const createdProducer = makeProducer(dto);
 
       jest.spyOn(prisma.producer, 'findFirst').mockResolvedValue(null);
       jest.spyOn(prisma.producer, 'create').mockResolvedValue(createdProducer);
@@ -66,12 +62,7 @@ describe('ProducersService', () => {
         name: 'John Doe',
         document: '12345678910',
       };
-      const existentProducer = {
-        id: '1',
-        ...dto,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const existentProducer = makeProducer(dto);
 
       jest
         .spyOn(prisma.producer, 'findFirst')
@@ -86,20 +77,8 @@ describe('ProducersService', () => {
   describe('findAll', () => {
     it('should return all producers', async () => {
       const producers = [
-        {
-          id: '1',
-          name: 'John Doe',
-          document: '12345678910',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          name: 'Jane Doe',
-          document: '98765432101',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+        makeProducer({ name: 'John Doe', document: '12345678910' }),
+        makeProducer({ name: 'Jane Doe', document: '98765432101' }),
       ];
 
       jest.spyOn(prisma.producer, 'findMany').mockResolvedValue(producers);
@@ -115,13 +94,11 @@ describe('ProducersService', () => {
   describe('findOne', () => {
     it('should return a producer by id', async () => {
       const id = '1';
-      const producer = {
+      const producer = makeProducer({
         id,
         name: 'John Doe',
         document: '12345678910',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
       jest.spyOn(prisma.producer, 'findUnique').mockResolvedValue(producer);
 
@@ -148,13 +125,11 @@ describe('ProducersService', () => {
     it('should update a producer', async () => {
       const id = '1';
       const updateDto = { name: 'Updated Name' };
-      const updatedProducer = {
+      const updatedProducer = makeProducer({
         id,
         name: updateDto.name,
         document: '12345678910',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
       jest
         .spyOn(prisma.producer, 'findUnique')

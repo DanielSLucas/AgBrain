@@ -5,6 +5,7 @@ import { CropsService } from '../services/crops.service';
 import { UpdateCropDto } from '../dto/update-crop.dto';
 import { CreateCropDto } from '../dto/create-crop.dto';
 import { Crop } from '../entities/crop.entity';
+import { makeCrop } from 'src/shared/utils/factories';
 
 describe('CropsController', () => {
   let controller: CropsController;
@@ -39,12 +40,7 @@ describe('CropsController', () => {
         name: 'milho',
         harvestId: 'harvestId',
       };
-      const createdCrop: Crop = {
-        id: '1',
-        ...dto,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const createdCrop = makeCrop(dto);
 
       jest.spyOn(service, 'create').mockResolvedValue(createdCrop);
 
@@ -56,22 +52,7 @@ describe('CropsController', () => {
 
   describe('findAll', () => {
     it('should return an array of crops', async () => {
-      const crops: Crop[] = [
-        {
-          id: '1',
-          name: 'milho',
-          harvestId: 'harvestId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          name: 'milho',
-          harvestId: 'harvestId',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+      const crops = [makeCrop(), makeCrop()];
 
       jest.spyOn(service, 'findAll').mockResolvedValue(crops);
 
@@ -84,13 +65,7 @@ describe('CropsController', () => {
   describe('findOne', () => {
     it('should return a crop by id', async () => {
       const id = '1';
-      const crop: Crop = {
-        id,
-        name: 'milho',
-        harvestId: 'harvestId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const crop: Crop = makeCrop({ id });
 
       jest.spyOn(service, 'findOne').mockResolvedValue(crop);
 
@@ -104,13 +79,7 @@ describe('CropsController', () => {
     it('should update a crop', async () => {
       const id = '1';
       const dto: UpdateCropDto = { name: 'soja' };
-      const updatedCrop: Crop = {
-        id,
-        name: 'milho',
-        harvestId: 'harvestId',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const updatedCrop = makeCrop({ id, ...dto });
 
       jest.spyOn(service, 'update').mockResolvedValue(updatedCrop);
 
