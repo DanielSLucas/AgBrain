@@ -100,8 +100,6 @@ export class FarmsService {
       },
     });
 
-    console.log(countByState);
-
     return countByState.map((item) => ({
       state: item.state,
       count: item._count.id,
