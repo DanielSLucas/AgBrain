@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 
-import { PrismaService } from 'src/shared/prisma.service';
+import { PrismaService } from 'src/shared/database/prisma.service';
 
 import { CreateCropDto } from '../dto/create-crop.dto';
 import { UpdateCropDto } from '../dto/update-crop.dto';

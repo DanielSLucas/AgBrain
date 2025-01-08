@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 
-import { PrismaService } from 'src/shared/prisma.service';
+import { PrismaService } from 'src/shared/database/prisma.service';
 
 import { CreateFarmDto } from '../dto/create-farm.dto';
 import { UpdateFarmDto } from '../dto/update-farm.dto';
@@ -99,6 +99,8 @@ export class FarmsService {
         id: true,
       },
     });
+
+    console.log(countByState);
 
     return countByState.map((item) => ({
       state: item.state,

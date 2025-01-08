@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from 'src/shared/prisma.service';
+import { PrismaService } from 'src/shared/database/prisma.service';
 import { FarmsService } from './farms.service';
 import { CreateFarmDto, UpdateFarmDto } from '../dto';
 import { Farm } from '../entities/farm.entity';

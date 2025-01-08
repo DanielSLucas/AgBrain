@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
 
 import { ProducersService } from '../services/producers.service';
-import { PrismaService } from 'src/shared/prisma.service';
+import { PrismaService } from 'src/shared/database/prisma.service';
 import { Producer } from '../entities/producer.entity';
 import { AlreadyExists } from 'src/shared/errors/already-exists';
 import { NotFound } from 'src/shared/errors/not-found';

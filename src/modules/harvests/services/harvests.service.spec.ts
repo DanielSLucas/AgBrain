@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
 
 import { HarvestsService } from './harvests.service';
-import { PrismaService } from 'src/shared/prisma.service';
+import { PrismaService } from 'src/shared/database/prisma.service';
 import { Harvest } from '../entities/harvest.entity';
 import { CreateHarvestDto } from '../dto/create-harvest.dto';
 import { NotFound } from 'src/shared/errors/not-found';

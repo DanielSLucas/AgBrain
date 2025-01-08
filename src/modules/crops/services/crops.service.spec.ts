@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
 
 import { CropsService } from './crops.service';
-import { PrismaService } from 'src/shared/prisma.service';
+import { PrismaService } from 'src/shared/database/prisma.service';
 import { Crop } from '../entities/crop.entity';
 import { CreateCropDto } from '../dto/create-crop.dto';
 import { NotFound } from 'src/shared/errors/not-found';
