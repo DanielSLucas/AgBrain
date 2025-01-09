@@ -6,8 +6,8 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class HttpInterceptor implements NestInterceptor {
@@ -17,39 +17,41 @@ export class HttpInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    const id = randomUUID();
-    const {
-      method,
-      originalUrl: url,
-      params,
-      query,
-      body,
-      headers,
-    } = context.switchToHttp().getRequest();
-
-    const startDate = new Date().toISOString();
+    const request = context.switchToHttp().getRequest();
 
     return next.handle().pipe(
       map((data) => {
-        const endDate = new Date().toISOString();
+        this.logRequestResponse(request, data);
 
-        this.logger.log(
-          JSON.stringify({
-            id,
-            startDate,
-            endDate,
-            method,
-            url,
-            request: {
-              headers,
-              params,
-              query,
-              body,
-            },
-            response: data,
-          }),
-        );
         return data;
+      }),
+      catchError((error) => {
+        this.logRequestResponse(request, error.response);
+        this.logger.debug(error.stack);
+
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  logRequestResponse(request: any, data: any) {
+    const id = randomUUID();
+    const createdAt = new Date().toISOString();
+    const { method, originalUrl: url, params, query, body, headers } = request;
+
+    this.logger.log(
+      JSON.stringify({
+        id,
+        createdAt,
+        method,
+        url,
+        request: {
+          headers,
+          params,
+          query,
+          body,
+        },
+        response: data,
       }),
     );
   }
