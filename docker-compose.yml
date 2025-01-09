@@ -1,4 +1,3 @@
-version: '3.9'
 
 services:
   database:
@@ -9,6 +8,20 @@ services:
     environment:
       - POSTGRESQL_USERNAME=docker
       - POSTGRESQL_PASSWORD=docker
-      - POSTGRESQL_DATABASE=app
-    volumes:
-      - $PWD/data/pg:/bitnami/postgresql    
+      - POSTGRESQL_DATABASE=brain-ag-db
+
+  server:
+    container_name: brain-ag
+    build: .
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      - DATABASE_URL=postgresql://docker:docker@database:5432/brain-ag-db
+    depends_on:
+      database:
+        condition: service_started
+    command: 
+      - npm 
+      - run
+      - start:migrate:prod
